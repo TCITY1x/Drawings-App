@@ -6,7 +6,7 @@ const FEATURES = [
   {
     icon: FileSearch,
     title: "Every word on every sheet, searchable",
-    body: "Drop a drawing set — loose PDFs or a zip — and FieldMark reads each sheet's number, revision and title block. Search a cable tag or terminal across the whole set and land on the exact spot, highlighted.",
+    body: "Drop a drawing set — loose PDFs or a zip — and SitePax reads each sheet's number, revision and title block. Search a cable tag or terminal across the whole set and land on the exact spot, highlighted.",
   },
   {
     icon: PenLine,
@@ -46,7 +46,7 @@ export default function Home() {
               Pricing
             </a>
             <Link href="/projects" className="rounded-lg bg-brand-600 px-4 py-2 font-medium text-white hover:bg-brand-700">
-              Open FieldMark
+              Open SitePax
             </Link>
           </nav>
         </div>
@@ -60,7 +60,7 @@ export default function Home() {
               Find it on the drawings. Mark it up. Sign it off.
             </h1>
             <p className="mt-5 text-lg text-slate-600 dark:text-slate-300">
-              FieldMark turns a project&apos;s drawing set into a searchable register, puts QA/QC issues and redlines on the
+              SitePax turns a project&apos;s drawing set into a searchable register, puts QA/QC issues and redlines on the
               sheet where they belong, and runs point-to-point commissioning through to a signed handover pack.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -109,7 +109,7 @@ export default function Home() {
       <footer className="border-t border-slate-200 px-4 py-8 text-sm text-slate-500 dark:border-slate-800">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
           <Logo withName className="text-slate-700 dark:text-slate-300" />
-          <span>© {new Date().getFullYear()} FieldMark</span>
+          <span>© {new Date().getFullYear()} SitePax</span>
         </div>
       </footer>
     </div>

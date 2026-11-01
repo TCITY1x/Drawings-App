@@ -4,9 +4,9 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-# FieldMark
+# SitePax
 
-FieldMark is a standalone product: a project's drawing register (searchable
+SitePax is a standalone product: a project's drawing register (searchable
 text of every sheet), QA/QC markups and redlines, and point-to-point
 commissioning packages. It began as the Drawings tab of an internal ops app;
 the code under `src/lib/drawings` and `src/components/drawings` came from

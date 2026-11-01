@@ -10,7 +10,7 @@ import { getSupabase } from "@/lib/supabase/client";
 import { EMPTY_WORKSPACE, loadWorkspace, storeWorkspace, type Profile, type Workspace } from "@/lib/workspaceStore";
 
 /**
- * Who is using FieldMark and what they're working on — what the drawings
+ * Who is using SitePax and what they're working on — what the drawings
  * screens need from outside themselves: the signed-in person, their company
  * (printed on packages), their team (offered when assigning and signing),
  * their projects, and the addresses they've sent drawings to before.
@@ -130,7 +130,7 @@ function LocalProvider({ children }: { children: React.ReactNode }) {
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;
 }
 
-const COMPANY_KEY = "fieldmark:company";
+const COMPANY_KEY = "sitepax:company";
 
 function rememberedCompany(): string | null {
   try {

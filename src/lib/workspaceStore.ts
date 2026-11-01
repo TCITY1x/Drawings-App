@@ -24,7 +24,7 @@ export interface Workspace {
   recipients: Recipient[];
 }
 
-const KEY = "fieldmark:workspace:v1";
+const KEY = "sitepax:workspace:v1";
 
 export const EMPTY_WORKSPACE: Workspace = { profile: null, members: [], projects: [], recipients: [] };
 

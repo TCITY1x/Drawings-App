@@ -5,10 +5,10 @@
 function makeId(): string {
   if (typeof window === "undefined") return "server";
   try {
-    const existing = window.localStorage.getItem("fieldmark:client-id");
+    const existing = window.localStorage.getItem("sitepax:client-id");
     if (existing) return existing;
     const id = crypto.randomUUID();
-    window.localStorage.setItem("fieldmark:client-id", id);
+    window.localStorage.setItem("sitepax:client-id", id);
     return id;
   } catch {
     return crypto.randomUUID();

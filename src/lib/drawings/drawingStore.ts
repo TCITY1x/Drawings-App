@@ -36,7 +36,7 @@ import {
 const TABLE = "drawings";
 const MARKUP_TABLE = "drawing_markups";
 const PACKAGE_TABLE = "commissioning_packages";
-const DB_NAME = "fieldmark-drawings";
+const DB_NAME = "sitepax-drawings";
 const DB_VERSION = 1;
 const RECORDS = "drawings";
 const FILES = "files";
