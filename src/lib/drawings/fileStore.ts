@@ -17,7 +17,7 @@ import { getSupabase } from "@/lib/supabase/client";
 
 export const BUCKET = "drawings";
 
-const DB_NAME = "fieldmark-files";
+const DB_NAME = "sitepax-files";
 const STORE = "originals";
 
 function openDb(): Promise<IDBDatabase> {
@@ -73,7 +73,7 @@ export function putDrawingFile(input: { projectId: string; drawingId: string; bl
 function split(key: string): { where: "sb" | "local"; path: string } {
   const at = key.indexOf(":");
   const where = key.slice(0, at);
-  if (at < 0 || (where !== "sb" && where !== "local")) throw new Error("That file isn't in FieldMark's storage.");
+  if (at < 0 || (where !== "sb" && where !== "local")) throw new Error("That file isn't in SitePax's storage.");
   return { where, path: key.slice(at + 1) };
 }
 
@@ -81,7 +81,7 @@ export async function getDrawingFile(key: string): Promise<Blob> {
   const { where, path } = split(key);
   if (where === "sb") {
     const supabase = getSupabase();
-    if (!supabase) throw new Error("This drawing is stored online, and FieldMark isn't connected.");
+    if (!supabase) throw new Error("This drawing is stored online, and SitePax isn't connected.");
     const { data, error } = await supabase.storage.from(BUCKET).download(path);
     if (error || !data) throw new Error(`Couldn't fetch the drawing: ${error?.message ?? "no file"}`);
     return data;

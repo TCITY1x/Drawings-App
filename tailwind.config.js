@@ -1,5 +1,5 @@
 /**
- * FieldMark teal. The drawings screens were written against Tailwind's
+ * SitePax teal. The drawings screens were written against Tailwind's
  * `indigo`, so that name points at this scale too; new work can say `brand-*`.
  * Teal keeps clear of the three markup inks (red, blue, yellow).
  */

@@ -4,9 +4,9 @@ import { MAX_ATTACHMENT_BYTES, sendProblems, uniqueAddresses, isEmail } from "@/
 /**
  * Send marked-up drawings or a package by email, through Resend.
  *
- * Only a signed-in FieldMark user may send — checked against Supabase with
+ * Only a signed-in SitePax user may send — checked against Supabase with
  * the bearer token the dialog sends. Before accounts exist (local mode) the
- * route refuses unless FIELDMARK_ALLOW_UNAUTHENTICATED_SEND=1, which is for
+ * route refuses unless SITEPAX_ALLOW_UNAUTHENTICATED_SEND=1, which is for
  * a developer's own machine only: on a public deployment it would let anyone
  * send mail as you.
  */
@@ -18,7 +18,7 @@ function refuse(status: number, error: string, code?: string) {
 async function signedIn(request: Request): Promise<boolean> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return process.env.FIELDMARK_ALLOW_UNAUTHENTICATED_SEND === "1";
+  if (!url || !key) return process.env.SITEPAX_ALLOW_UNAUTHENTICATED_SEND === "1";
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!token) return false;
   const { data, error } = await createClient(url, key).auth.getUser(token);
@@ -30,10 +30,10 @@ function escapeHtml(text: string): string {
 }
 
 export async function POST(request: Request) {
-  if (!(await signedIn(request))) return refuse(401, "Sign in to send email from FieldMark.", "sign-in-required");
+  if (!(await signedIn(request))) return refuse(401, "Sign in to send email from SitePax.", "sign-in-required");
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.FIELDMARK_FROM_EMAIL;
-  if (!apiKey || !from) return refuse(503, "Email isn't set up on this FieldMark yet.", "email-not-configured");
+  const from = process.env.SITEPAX_FROM_EMAIL;
+  if (!apiKey || !from) return refuse(503, "Email isn't set up on this SitePax yet.", "email-not-configured");
 
   const form = await request.formData().catch(() => null);
   if (!form) return refuse(400, "That wasn't a send request.");
@@ -57,9 +57,9 @@ export async function POST(request: Request) {
   const attachments = await Promise.all(
     files.map(async (file) => ({ filename: file.name, content: Buffer.from(await file.arrayBuffer()).toString("base64") }))
   );
-  // "Taylor via FieldMark <noreply@…>", so the inbox shows who it's from.
-  const [, fromName = "FieldMark", fromAddress = from] = /^\s*(.*?)\s*<([^>]+)>\s*$/.exec(from) ?? [];
-  const display = fromName || "FieldMark";
+  // "Taylor via SitePax <noreply@…>", so the inbox shows who it's from.
+  const [, fromName = "SitePax", fromAddress = from] = /^\s*(.*?)\s*<([^>]+)>\s*$/.exec(from) ?? [];
+  const display = fromName || "SitePax";
   const fromHeader = `${senderName ? `${senderName} via ${display}` : display} <${fromAddress.trim()}>`;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",

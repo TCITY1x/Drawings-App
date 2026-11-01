@@ -20,7 +20,7 @@ function Card({ title, lead, children }: { title: string; lead: string; children
 }
 
 /**
- * Sign in without a password: FieldMark emails a link (and a code, for when
+ * Sign in without a password: SitePax emails a link (and a code, for when
  * the link opens in a different browser from this one — common on a tablet).
  */
 export function SignIn() {
@@ -77,7 +77,7 @@ export function SignIn() {
   }
 
   return (
-    <Card title="Sign in to FieldMark" lead="New here? The same step makes your account.">
+    <Card title="Sign in to SitePax" lead="New here? The same step makes your account.">
       <form
         className="space-y-3"
         onSubmit={(event) => {

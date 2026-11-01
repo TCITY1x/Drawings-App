@@ -5,10 +5,10 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: { default: "FieldMark — drawings, markups and commissioning", template: "%s · FieldMark" },
+  title: { default: "SitePax — drawings, markups and commissioning", template: "%s · SitePax" },
   description:
     "Search every word on every sheet, mark up issues and redlines, and run point-to-point commissioning packages — in the browser, on site or at the desk.",
-  appleWebApp: { title: "FieldMark", capable: true },
+  appleWebApp: { title: "SitePax", capable: true },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

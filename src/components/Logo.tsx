@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 
-/** The FieldMark mark: a sheet with a revision cloud's tick. */
+/** The SitePax mark: a sheet with a revision cloud's tick. */
 export function Logo({ className, withName = true }: { className?: string; withName?: boolean }) {
   return (
     <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight", className)}>
@@ -9,7 +9,7 @@ export function Logo({ className, withName = true }: { className?: string; withN
         <path d="M9 10h14M9 15h9" stroke="white" strokeWidth="2" strokeLinecap="round" opacity=".55" />
         <path d="M10.5 21.5l3.5 3.5 8-9" stroke="#facc15" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      {withName && <span>FieldMark</span>}
+      {withName && <span>SitePax</span>}
     </span>
   );
 }

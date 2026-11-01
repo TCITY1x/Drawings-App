@@ -1,8 +1,8 @@
-# FieldMark
+# SitePax
 
 Find it on the drawings. Mark it up. Sign it off.
 
-FieldMark turns a project's drawing set into a searchable register, puts QA/QC
+SitePax turns a project's drawing set into a searchable register, puts QA/QC
 issues and redlines on the sheet where they belong, and runs point-to-point
 commissioning through to a signed handover pack.
 
@@ -31,13 +31,13 @@ npm test           # unit tests
 npm run build
 ```
 
-With no environment variables FieldMark runs in **local mode**: everything is
+With no environment variables SitePax runs in **local mode**: everything is
 saved in the browser. Copy `.env.example` to `.env.local` to connect Supabase
 and email.
 
 ## Accounts (cloud mode)
 
-With Supabase configured, FieldMark asks people to sign in with an emailed
+With Supabase configured, SitePax asks people to sign in with an emailed
 link or code — no passwords. Someone who isn't in a company yet starts one (a
 14-day trial, 5 seats) and becomes its owner. Admins invite people by email on
 the Team page; an invited person joins as soon as they sign in with that
@@ -46,9 +46,9 @@ security, not just the screens.
 
 ## Setting up the cloud
 
-1. Create a Supabase project (Sydney, `ap-southeast-2`) in the FieldMark
+1. Create a Supabase project (Sydney, `ap-southeast-2`) in the SitePax
    organisation, and apply every file in `supabase/migrations`, in order.
-2. **Authentication → URL configuration**: set the Site URL to where FieldMark
+2. **Authentication → URL configuration**: set the Site URL to where SitePax
    is served, and add `<site>/auth/callback` (and
    `http://localhost:3000/auth/callback` for development) to the redirect URLs.
 3. **Authentication → Email templates**: add the code to the *Magic link* and
@@ -58,8 +58,8 @@ security, not just the screens.
    messages an hour — fine for testing, not for customers. Point it at Resend
    (`smtp.resend.com`, port 465, user `resend`, password = API key) before launch.
 5. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (the
-   publishable key) wherever FieldMark is deployed.
-6. For sending markups: `RESEND_API_KEY` and `FIELDMARK_FROM_EMAIL`, from a
+   publishable key) wherever SitePax is deployed.
+6. For sending markups: `RESEND_API_KEY` and `SITEPAX_FROM_EMAIL`, from a
    verified sending domain.
 
 Still to build: Stripe billing (checkout, the billing portal, and a webhook that

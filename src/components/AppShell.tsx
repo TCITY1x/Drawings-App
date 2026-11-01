@@ -30,7 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
-          <Link href="/projects" aria-label="FieldMark projects">
+          <Link href="/projects" aria-label="SitePax projects">
             <Logo />
           </Link>
           <nav aria-label="Main" className="flex gap-1">
@@ -129,7 +129,7 @@ function Welcome() {
 
   return (
     <div className="mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <h1 className="text-xl font-semibold">Welcome to FieldMark</h1>
+      <h1 className="text-xl font-semibold">Welcome to SitePax</h1>
       <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
         Your name goes on markups and sign-offs, and your company on commissioning packages.
       </p>
