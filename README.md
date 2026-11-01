@@ -62,9 +62,36 @@ security, not just the screens.
 6. For sending markups: `RESEND_API_KEY` and `SITEPAX_FROM_EMAIL`, from a
    verified sending domain.
 
-Still to build: Stripe billing (checkout, the billing portal, and a webhook that
-updates `organisations.plan`/`seats` with the service role), enforcing the
-trial's end, and moving a local-mode workspace into an account.
+## Setting up billing
+
+SitePax is one subscription per company, priced per user (seat) per month.
+The owner subscribes on the Team page, choosing at least as many seats as there
+are members and invitations; Stripe Checkout takes the card, and the billing
+portal handles seat changes, card updates, invoices and cancelling. A webhook
+keeps `organisations.plan`, `plan_status` and `seats` in step — the database
+lets only the service role change them.
+
+1. **Stripe → Product catalogue**: add a product "SitePax" with a recurring
+   price per unit, monthly, in your currency (e.g. AUD, tax-inclusive or
+   exclusive as you decide). Copy the price's id (`price_…`).
+2. **Stripe → Settings → Billing → Customer portal**: turn on updating
+   quantities for that product, payment methods, invoice history and
+   cancellation (at the period's end).
+3. **Stripe → Developers → Webhooks**: add an endpoint at
+   `<site>/api/stripe/webhook` for `checkout.session.completed` and
+   `customer.subscription.created`, `.updated`, `.deleted`, `.paused` and
+   `.resumed`. Copy its signing secret (`whsec_…`).
+4. Set, wherever SitePax is deployed: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`,
+   `STRIPE_WEBHOOK_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Project
+   settings → API keys, the secret key — server-only, never `NEXT_PUBLIC_`),
+   and optionally `SITEPAX_SITE_URL` and `NEXT_PUBLIC_SITEPAX_PRICE_LABEL`
+   (e.g. `A$25 per user per month`).
+5. Test with Stripe's test keys and card `4242 4242 4242 4242` first; for local
+   development, `stripe listen --forward-to localhost:3000/api/stripe/webhook`
+   prints a webhook secret to use.
+
+Still to build: enforcing the trial's end (and a cancelled plan), and moving a
+local-mode workspace into an account.
 
 ## Licences
 

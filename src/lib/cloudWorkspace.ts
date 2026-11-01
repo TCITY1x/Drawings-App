@@ -23,6 +23,10 @@ export interface Membership {
   planStatus: string;
   trialEndsAt: string;
   seats: number;
+  /** True once the company has a Stripe customer (it has started a checkout), so the billing portal can open. */
+  hasBillingAccount: boolean;
+  currentPeriodEndsAt: string;
+  cancelAtPeriodEnd: boolean;
 }
 
 export interface TeamMember extends Member {
@@ -70,7 +74,7 @@ export async function loadMemberships(supabase: SupabaseClient, userId: string):
   await supabase.rpc("accept_invitations");
   const { data, error } = await supabase
     .from("organisation_members")
-    .select("organisation_id, role, name, email, settings, organisations (name, plan, plan_status, trial_ends_at, seats)")
+    .select("organisation_id, role, name, email, settings, organisations (name, plan, plan_status, trial_ends_at, seats, stripe_customer_id, current_period_ends_at, cancel_at_period_end)")
     .eq("user_id", userId)
     .order("created_at");
   if (error) fail("load your companies", error);
@@ -87,6 +91,9 @@ export async function loadMemberships(supabase: SupabaseClient, userId: string):
       planStatus: String(org?.plan_status ?? ""),
       trialEndsAt: String(org?.trial_ends_at ?? ""),
       seats: Number(org?.seats ?? 0),
+      hasBillingAccount: Boolean(org?.stripe_customer_id),
+      currentPeriodEndsAt: String(org?.current_period_ends_at ?? ""),
+      cancelAtPeriodEnd: org?.cancel_at_period_end === true,
     };
   });
 }
@@ -208,4 +215,26 @@ export async function deleteProject(supabase: SupabaseClient, id: string): Promi
   }
   const { error } = await supabase.from("projects").delete().eq("id", id);
   if (error) fail("delete the project", error);
+}
+
+/**
+ * Open Stripe for the company — Checkout to subscribe, or the billing portal
+ * once subscribed — through the server routes, which check that the caller is
+ * an owner. Returns the page to send the browser to.
+ */
+export async function billingPage(
+  supabase: SupabaseClient,
+  which: "checkout" | "portal",
+  organisationId: string,
+  seats?: number
+): Promise<string> {
+  const { data } = await supabase.auth.getSession();
+  const response = await fetch(`/api/billing/${which}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session?.access_token ?? ""}` },
+    body: JSON.stringify({ organisationId, seats }),
+  });
+  const body = (await response.json().catch(() => ({}))) as { url?: string; error?: string };
+  if (!response.ok || !body.url) throw new Error(body.error ?? "Billing couldn't be opened.");
+  return body.url;
 }

@@ -61,6 +61,8 @@ export interface CloudState {
   chooseCompany: (organisationId: string) => void;
   createCompany: (name: string, yourName: string) => Promise<void>;
   refreshTeam: () => Promise<void>;
+  /** Re-read the companies (plan, seats) — after returning from Stripe. */
+  refreshCompanies: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -299,6 +301,7 @@ function CloudProvider({ supabase, children }: { supabase: SupabaseClient; child
               await loadCompanies(user.id, id);
             },
             refreshTeam,
+            refreshCompanies: () => loadCompanies(user.id, membership?.organisationId),
             signOut: async () => {
               await supabase.auth.signOut();
               setProjects([]);

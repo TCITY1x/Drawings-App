@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Mail, Trash2, UserPlus } from "lucide-react";
+import { Billing } from "@/components/team/Billing";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Field, inputClass } from "@/components/ui/fields";
@@ -127,6 +128,8 @@ export function CloudTeam() {
           })}
         </ul>
       </section>
+
+      <Billing />
 
       {admin && (
         <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
