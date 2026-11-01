@@ -35,15 +35,36 @@ With no environment variables FieldMark runs in **local mode**: everything is
 saved in the browser. Copy `.env.example` to `.env.local` to connect Supabase
 and email.
 
-## Setting up the cloud (not done yet)
+## Accounts (cloud mode)
 
-1. Create a Supabase project and apply `supabase/migrations` (tables, row-level
-   security, and the private `drawings` storage bucket).
-2. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-3. Set `RESEND_API_KEY` and `FIELDMARK_FROM_EMAIL` (a verified sending domain).
+With Supabase configured, FieldMark asks people to sign in with an emailed
+link or code — no passwords. Someone who isn't in a company yet starts one (a
+14-day trial, 5 seats) and becomes its owner. Admins invite people by email on
+the Team page; an invited person joins as soon as they sign in with that
+address. Owners, admins and members are enforced by the database's row-level
+security, not just the screens.
 
-Still to build: sign-in, organisations and invites, moving the workspace
-(profile, team, projects) from localStorage to the database, and Stripe billing.
+## Setting up the cloud
+
+1. Create a Supabase project (Sydney, `ap-southeast-2`) in the FieldMark
+   organisation, and apply every file in `supabase/migrations`, in order.
+2. **Authentication → URL configuration**: set the Site URL to where FieldMark
+   is served, and add `<site>/auth/callback` (and
+   `http://localhost:3000/auth/callback` for development) to the redirect URLs.
+3. **Authentication → Email templates**: add the code to the *Magic link* and
+   *Confirm signup* templates, e.g. `Or enter this code: {{ .Token }}`, so people
+   whose link opens in another browser (common on tablets) can still sign in.
+4. **Authentication → SMTP**: Supabase's built-in email is limited to a few
+   messages an hour — fine for testing, not for customers. Point it at Resend
+   (`smtp.resend.com`, port 465, user `resend`, password = API key) before launch.
+5. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (the
+   publishable key) wherever FieldMark is deployed.
+6. For sending markups: `RESEND_API_KEY` and `FIELDMARK_FROM_EMAIL`, from a
+   verified sending domain.
+
+Still to build: Stripe billing (checkout, the billing portal, and a webhook that
+updates `organisations.plan`/`seats` with the service role), enforcing the
+trial's end, and moving a local-mode workspace into an account.
 
 ## Licences
 

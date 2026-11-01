@@ -3,23 +3,28 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderKanban, Users } from "lucide-react";
+import { FolderKanban, LogOut, Users, X } from "lucide-react";
+import { CreateCompany, SignIn } from "@/components/CloudGate";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/Button";
 import { Field, inputClass } from "@/components/ui/fields";
 import { useWorkspace } from "@/context/WorkspaceContext";
 import { cn } from "@/lib/cn";
-import { isCloudConfigured } from "@/lib/supabase/client";
 
 const NAV = [
   { href: "/projects", label: "Projects", icon: FolderKanban },
   { href: "/settings", label: "Team", icon: Users },
 ];
 
-/** The signed-in frame: header and nav, and the one-time "who are you" step before anything else. */
+/**
+ * The signed-in frame: header and nav, and whatever has to come first —
+ * locally, the one-time "who are you" step; in the cloud, signing in and
+ * choosing or creating a company.
+ */
 export function AppShell({ children }: { children: React.ReactNode }) {
-  const { hydrated, profile } = useWorkspace();
+  const { mode, authState, profile, cloud, error, clearError } = useWorkspace();
   const pathname = usePathname();
+  const companies = cloud?.memberships ?? [];
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
@@ -46,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400">
-            {!isCloudConfigured() && (
+            {mode === "local" && (
               <span
                 className="hidden rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 sm:inline dark:bg-amber-500/15 dark:text-amber-300"
                 title="Everything is kept in this browser until accounts are switched on."
@@ -54,17 +59,61 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 Saved on this device
               </span>
             )}
-            {profile && <span className="hidden truncate md:inline">{profile.name}</span>}
+            {cloud && companies.length > 1 && (
+              <select
+                aria-label="Company"
+                value={cloud.membership?.organisationId ?? ""}
+                onChange={(event) => cloud.chooseCompany(event.target.value)}
+                className="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm dark:border-slate-700 dark:bg-slate-800"
+              >
+                {companies.map((one) => (
+                  <option key={one.organisationId} value={one.organisationId}>
+                    {one.organisationName}
+                  </option>
+                ))}
+              </select>
+            )}
+            {profile && (
+              <span className="hidden truncate md:inline">
+                {profile.name}
+                {cloud && companies.length <= 1 && profile.company ? ` · ${profile.company}` : ""}
+              </span>
+            )}
+            {cloud && (
+              <button
+                type="button"
+                onClick={() => void cloud.signOut()}
+                aria-label="Sign out"
+                title="Sign out"
+                className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <LogOut size={16} aria-hidden="true" />
+              </button>
+            )}
           </div>
         </div>
       </header>
+      {error && (
+        <div role="alert" className="border-b border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+          <div className="mx-auto flex max-w-7xl items-center gap-2">
+            <span className="flex-1">{error}</span>
+            <button type="button" onClick={clearError} aria-label="Dismiss" className="rounded p-1 hover:bg-red-100 dark:hover:bg-red-500/20">
+              <X size={14} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      )}
       <main className="flex-1 px-4 py-6">
-        {!hydrated ? (
+        {authState === "loading" ? (
           <div className="mx-auto h-64 max-w-6xl animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800/50" aria-busy="true" aria-label="Loading" />
-        ) : profile ? (
+        ) : authState === "ready" ? (
           children
-        ) : (
+        ) : mode === "local" ? (
           <Welcome />
+        ) : authState === "signed-out" ? (
+          <SignIn />
+        ) : (
+          <CreateCompany />
         )}
       </main>
     </div>

@@ -18,8 +18,13 @@ there, with jobs renamed to projects.
   in IndexedDB (`src/lib/drawings/fileStore.ts`).
 - **Cloud mode**: the same stores write to Supabase tables and the private
   `drawings` storage bucket. Schema and row-level security are in
-  `supabase/migrations`. Accounts, organisations and billing UI are not built
-  yet.
+  `supabase/migrations`. Sign-in (email link or code), companies, roles and
+  invitations are in `src/lib/cloudWorkspace.ts`, `src/context/WorkspaceContext.tsx`
+  (one interface over both modes), `src/components/CloudGate.tsx` and
+  `src/components/team/`. Billing is not built yet.
+- Access rules live in the database. When adding a table, give it row-level
+  security keyed on the organisation, and test the policies as two different
+  users before relying on them.
 - Pure modules (`*.ts` with no relative imports) are tested with `node --test`;
   keep them free of React and browser APIs.
 - Verify with `npm test`, `npx tsc --noEmit`, `npx eslint` and `npm run build`.

@@ -30,10 +30,10 @@ function escapeHtml(text: string): string {
 }
 
 export async function POST(request: Request) {
+  if (!(await signedIn(request))) return refuse(401, "Sign in to send email from FieldMark.", "sign-in-required");
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.FIELDMARK_FROM_EMAIL;
   if (!apiKey || !from) return refuse(503, "Email isn't set up on this FieldMark yet.", "email-not-configured");
-  if (!(await signedIn(request))) return refuse(401, "Sign in to send email from FieldMark.", "sign-in-required");
 
   const form = await request.formData().catch(() => null);
   if (!form) return refuse(400, "That wasn't a send request.");
