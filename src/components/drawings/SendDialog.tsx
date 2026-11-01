@@ -8,7 +8,7 @@ import { Field, inputClass } from "@/components/ui/fields";
 import { useWorkspace } from "@/context/WorkspaceContext";
 import { isEmail, sendProblems, uniqueAddresses } from "@/lib/email";
 import { downloadBlob } from "@/lib/format";
-import { getSupabase } from "@/lib/supabase/client";
+import { authedFetch } from "@/lib/authedFetch";
 
 export interface SendAttachment {
   name: string;
@@ -89,11 +89,7 @@ export function SendDialog({
       form.set("senderName", profile?.name ?? "");
       form.set("replyTo", profile?.email ?? "");
       for (const one of attachments) form.append("files", one.blob, one.name);
-      const headers: Record<string, string> = {};
-      const session = await getSupabase()?.auth.getSession();
-      const token = session?.data.session?.access_token;
-      if (token) headers.Authorization = `Bearer ${token}`;
-      const response = await fetch("/api/send", { method: "POST", body: form, headers });
+      const response = await authedFetch("/api/send", { method: "POST", body: form });
       const result = (await response.json().catch(() => ({}))) as { error?: string; code?: string };
       if (response.ok) return await finish();
       if (result.code === "email-not-configured" || result.code === "sign-in-required") {

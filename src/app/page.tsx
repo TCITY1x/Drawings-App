@@ -35,6 +35,8 @@ const FEATURES = [
   },
 ];
 
+const PRICE = process.env.NEXT_PUBLIC_SITEPAX_PRICE ?? "";
+
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
@@ -89,7 +91,7 @@ export default function Home() {
         <section id="pricing" className="bg-slate-50 px-4 py-16 dark:bg-slate-900/50">
           <div className="mx-auto max-w-4xl text-center">
             <h2 className="text-3xl font-bold tracking-tight">Simple pricing</h2>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">Pricing is being finalised — early teams get in free while we&apos;re in beta.</p>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">Every plan starts with a 14-day free trial. No card needed to start.</p>
             <div className="mt-8 grid gap-6 text-left sm:grid-cols-2">
               <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
                 <h3 className="font-semibold">Solo</h3>
@@ -98,8 +100,11 @@ export default function Home() {
               </div>
               <div className="rounded-2xl border-2 border-brand-500 bg-white p-6 dark:bg-slate-900">
                 <h3 className="font-semibold">Team</h3>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Shared projects, cloud storage, email sending, and every device in sync.</p>
-                <p className="mt-4 text-3xl font-bold">Coming soon</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Shared projects, cloud storage, email sending, and every device in sync. Add or remove seats any time.</p>
+                <p className="mt-4 text-3xl font-bold">{PRICE || "Per user, monthly"}</p>
+                <Link href="/projects" className="mt-4 inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+                  Start the free trial
+                </Link>
               </div>
             </div>
           </div>

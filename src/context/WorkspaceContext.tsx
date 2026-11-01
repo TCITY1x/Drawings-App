@@ -60,6 +60,8 @@ export interface CloudState {
   invitations: cloud.Invitation[];
   chooseCompany: (organisationId: string) => void;
   createCompany: (name: string, yourName: string) => Promise<void>;
+  /** Re-read the companies — after billing changes, which arrive by webhook. */
+  refreshCompanies: () => Promise<void>;
   refreshTeam: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -298,6 +300,7 @@ function CloudProvider({ supabase, children }: { supabase: SupabaseClient; child
               const id = await cloud.createOrganisation(supabase, name, yourName);
               await loadCompanies(user.id, id);
             },
+            refreshCompanies: () => loadCompanies(user.id, membership?.organisationId),
             refreshTeam,
             signOut: async () => {
               await supabase.auth.signOut();

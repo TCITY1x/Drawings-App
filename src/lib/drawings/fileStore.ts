@@ -1,3 +1,4 @@
+import { explainRefusal } from "@/lib/billing";
 import { getSupabase } from "@/lib/supabase/client";
 
 /**
@@ -57,7 +58,7 @@ export async function putProjectFile(input: { projectId: string; name: string; b
     const { error } = await supabase.storage
       .from(BUCKET)
       .upload(path, input.blob, { contentType: input.contentType, upsert: true });
-    if (error) throw new Error(`Couldn't store ${input.name}: ${error.message}`);
+    if (error) throw new Error(`Couldn't store ${input.name}: ${explainRefusal(error.message)}`);
     return `sb:${path}`;
   }
   const bytes = await input.blob.arrayBuffer();

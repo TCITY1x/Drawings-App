@@ -21,7 +21,9 @@ there, with jobs renamed to projects.
   `supabase/migrations`. Sign-in (email link or code), companies, roles and
   invitations are in `src/lib/cloudWorkspace.ts`, `src/context/WorkspaceContext.tsx`
   (one interface over both modes), `src/components/CloudGate.tsx` and
-  `src/components/team/`. Billing is not built yet.
+  `src/components/team/`. Billing: `src/lib/billing.ts` (plan rules, mirrored
+  by `org_active` in SQL), `src/lib/server/` (service role, Stripe — server
+  only), `src/app/api/billing/*` and `src/app/api/stripe/webhook`.
 - Access rules live in the database. When adding a table, give it row-level
   security keyed on the organisation, and test the policies as two different
   users before relying on them.

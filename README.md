@@ -62,9 +62,34 @@ security, not just the screens.
 6. For sending markups: `RESEND_API_KEY` and `SITEPAX_FROM_EMAIL`, from a
    verified sending domain.
 
-Still to build: Stripe billing (checkout, the billing portal, and a webhook that
-updates `organisations.plan`/`seats` with the service role), enforcing the
-trial's end, and moving a local-mode workspace into an account.
+## Billing (Stripe)
+
+A company starts on a 14-day trial with 5 seats. The owner chooses the Team
+plan on the Team page (Stripe Checkout, priced per seat) and later manages it in
+Stripe's billing portal — seats, card, invoices, cancelling. A webhook keeps the
+company's plan, status and seats in step with Stripe.
+
+When the trial ends unpaid, or the subscription ends, the company is
+**read-only**: the database refuses new or changed projects, drawings, markups,
+packages, files and invitations, while reading, downloading and deleting still
+work. A failed renewal (`past_due`) keeps working while Stripe retries the card.
+
+To switch it on:
+
+1. In Stripe, create a Product ("SitePax Team") with a recurring **per-unit**
+   monthly Price, and note its id (`price_…`).
+2. **Settings → Billing → Customer portal**: allow updating payment methods,
+   viewing invoices, cancelling, and changing quantity for that Price.
+3. **Developers → Webhooks**: add `<site>/api/stripe/webhook` with the events
+   `checkout.session.completed` and `customer.subscription.created`, `.updated`,
+   `.deleted`, `.paused`, `.resumed`. Note the signing secret (`whsec_…`).
+4. Set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`,
+   `SUPABASE_SERVICE_ROLE_KEY` (server only — never `NEXT_PUBLIC_`),
+   `NEXT_PUBLIC_SITEPAX_PRICE` (e.g. `A$29 per user / month`) and
+   `SITEPAX_SITE_URL`.
+5. Test with Stripe's test keys and card `4242 4242 4242 4242` before going live.
+
+Still to build: moving a local-mode workspace into an account.
 
 ## Licences
 

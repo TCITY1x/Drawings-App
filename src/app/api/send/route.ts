@@ -1,5 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
 import { MAX_ATTACHMENT_BYTES, sendProblems, uniqueAddresses, isEmail } from "@/lib/email";
+import { requestUser } from "@/lib/server/supabase";
 
 /**
  * Send marked-up drawings or a package by email, through Resend.
@@ -16,13 +16,8 @@ function refuse(status: number, error: string, code?: string) {
 }
 
 async function signedIn(request: Request): Promise<boolean> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return process.env.SITEPAX_ALLOW_UNAUTHENTICATED_SEND === "1";
-  const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  if (!token) return false;
-  const { data, error } = await createClient(url, key).auth.getUser(token);
-  return !error && Boolean(data.user);
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return process.env.SITEPAX_ALLOW_UNAUTHENTICATED_SEND === "1";
+  return (await requestUser(request)) !== null;
 }
 
 function escapeHtml(text: string): string {

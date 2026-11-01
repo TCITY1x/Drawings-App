@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Mail, Trash2, UserPlus } from "lucide-react";
+import { BillingCard } from "@/components/team/BillingCard";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Field, inputClass } from "@/components/ui/fields";
@@ -78,6 +79,8 @@ export function CloudTeam() {
           <Button type="submit" variant="primary">Save</Button>
         </div>
       </form>
+
+      <BillingCard />
 
       <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-wrap items-baseline justify-between gap-2">

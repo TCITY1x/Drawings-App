@@ -9,6 +9,7 @@ import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/Button";
 import { Field, inputClass } from "@/components/ui/fields";
 import { useWorkspace } from "@/context/WorkspaceContext";
+import { billingNotice } from "@/lib/billing";
 import { cn } from "@/lib/cn";
 
 const NAV = [
@@ -25,6 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { mode, authState, profile, cloud, error, clearError } = useWorkspace();
   const pathname = usePathname();
   const companies = cloud?.memberships ?? [];
+  const notice = cloud?.membership && authState === "ready" ? billingNotice(cloud.membership) : null;
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
@@ -93,6 +95,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
+      {notice && (
+        <div
+          role="status"
+          className={cn(
+            "border-b px-4 py-2 text-sm",
+            notice.tone === "blocked"
+              ? "border-red-200 bg-red-50 text-red-900 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-100"
+              : "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100"
+          )}
+        >
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-1">
+            <span>{notice.text}</span>
+            {cloud?.membership?.role === "owner" ? (
+              <Link href="/settings#billing" className="font-semibold underline">
+                {cloud.membership.plan === "team" && cloud.membership.planStatus === "past_due" ? "Update the card" : "Choose a plan"}
+              </Link>
+            ) : (
+              <span className="opacity-80">Your company&apos;s owner can sort this out on the Team page.</span>
+            )}
+          </div>
+        </div>
+      )}
       {error && (
         <div role="alert" className="border-b border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
           <div className="mx-auto flex max-w-7xl items-center gap-2">

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { explainRefusal } from "@/lib/billing";
 import type { Recipient } from "@/lib/drawings/drawingMarkups";
 import type { Member } from "@/lib/members";
 import { sanitizeProject, type Project } from "@/lib/projects";
@@ -23,6 +24,8 @@ export interface Membership {
   planStatus: string;
   trialEndsAt: string;
   seats: number;
+  /** Whether Stripe has a customer for the company yet (so there are invoices to see). */
+  hasBillingAccount: boolean;
 }
 
 export interface TeamMember extends Member {
@@ -37,7 +40,7 @@ export interface Invitation {
 }
 
 function fail(what: string, error: { message: string } | null): never {
-  throw new Error(`Couldn't ${what}: ${error?.message ?? "no response"}`);
+  throw new Error(`Couldn't ${what}: ${error ? explainRefusal(error.message) : "no response"}`);
 }
 
 function recipientsFrom(settings: unknown): Recipient[] {
@@ -70,7 +73,7 @@ export async function loadMemberships(supabase: SupabaseClient, userId: string):
   await supabase.rpc("accept_invitations");
   const { data, error } = await supabase
     .from("organisation_members")
-    .select("organisation_id, role, name, email, settings, organisations (name, plan, plan_status, trial_ends_at, seats)")
+    .select("organisation_id, role, name, email, settings, organisations (name, plan, plan_status, trial_ends_at, seats, stripe_customer_id)")
     .eq("user_id", userId)
     .order("created_at");
   if (error) fail("load your companies", error);
@@ -87,6 +90,7 @@ export async function loadMemberships(supabase: SupabaseClient, userId: string):
       planStatus: String(org?.plan_status ?? ""),
       trialEndsAt: String(org?.trial_ends_at ?? ""),
       seats: Number(org?.seats ?? 0),
+      hasBillingAccount: Boolean(org?.stripe_customer_id),
     };
   });
 }

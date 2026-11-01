@@ -1,3 +1,4 @@
+import { explainRefusal } from "@/lib/billing";
 import { getSupabase } from "@/lib/supabase/client";
 import { CLIENT_ID } from "@/lib/clientId";
 import { getDrawingFile, removeDrawingFile } from "@/lib/drawings/fileStore";
@@ -124,7 +125,7 @@ export async function listDrawings(projectId: string): Promise<ProjectDrawing[]>
   if (supabase) {
     const { data, error } = await supabase.from(TABLE).select("data").eq("project_id", projectId);
     if (!error) return (data ?? []).map((row) => sanitizeDrawing(row.data)).filter((d): d is ProjectDrawing => d !== null);
-    if (!missingTable(error.message)) throw new Error(`Couldn't load the drawings: ${error.message}`);
+    if (!missingTable(error.message)) throw new Error(`Couldn't load the drawings: ${explainRefusal(error.message)}`);
     cloudMissing.add(TABLE);
   }
   const rows = await run<unknown[]>(RECORDS, "readonly", (store) => store.index("projectId").getAll(projectId));
@@ -138,7 +139,7 @@ export async function saveDrawing(drawing: ProjectDrawing): Promise<void> {
       .from(TABLE)
       .upsert({ id: drawing.id, project_id: drawing.projectId, data: drawing, client_id: CLIENT_ID });
     if (!error) return;
-    if (!missingTable(error.message)) throw new Error(`Couldn't save ${drawing.number || drawing.fileName}: ${error.message}`);
+    if (!missingTable(error.message)) throw new Error(`Couldn't save ${drawing.number || drawing.fileName}: ${explainRefusal(error.message)}`);
     cloudMissing.add(TABLE);
   }
   await run(RECORDS, "readwrite", (store) => store.put(drawing));
@@ -152,7 +153,7 @@ export async function deleteDrawing(drawing: ProjectDrawing, { keepFile = false 
   const supabase = cloud();
   if (supabase) {
     const { error } = await supabase.from(TABLE).delete().eq("id", drawing.id);
-    if (error && !missingTable(error.message)) throw new Error(`Couldn't remove ${drawing.number}: ${error.message}`);
+    if (error && !missingTable(error.message)) throw new Error(`Couldn't remove ${drawing.number}: ${explainRefusal(error.message)}`);
     if (error) cloudMissing.add(TABLE);
   }
   if (!supabase || cloudMissing.has(TABLE)) await run(RECORDS, "readwrite", (store) => store.delete(drawing.id));
@@ -308,7 +309,7 @@ export async function listMarkups(projectId: string): Promise<DrawingMarkup[]> {
   if (supabase) {
     const { data, error } = await supabase.from(MARKUP_TABLE).select("data").eq("project_id", projectId);
     if (!error) return (data ?? []).map((row) => sanitizeMarkup(row.data)).filter((m): m is DrawingMarkup => m !== null);
-    if (!missingTable(error.message)) throw new Error(`Couldn't load the markups: ${error.message}`);
+    if (!missingTable(error.message)) throw new Error(`Couldn't load the markups: ${explainRefusal(error.message)}`);
     cloudMissing.add(MARKUP_TABLE);
   }
   const rows = await run<unknown[]>(MARKUPS, "readonly", (store) => store.index("projectId").getAll(projectId));
@@ -322,7 +323,7 @@ export async function saveMarkup(markup: DrawingMarkup): Promise<void> {
       .from(MARKUP_TABLE)
       .upsert({ id: markup.id, project_id: markup.projectId, data: markup, client_id: CLIENT_ID });
     if (!error) return;
-    if (!missingTable(error.message)) throw new Error(`Couldn't save markup #${markup.number}: ${error.message}`);
+    if (!missingTable(error.message)) throw new Error(`Couldn't save markup #${markup.number}: ${explainRefusal(error.message)}`);
     cloudMissing.add(MARKUP_TABLE);
   }
   await run(MARKUPS, "readwrite", (store) => store.put(markup));
@@ -333,7 +334,7 @@ export async function deleteMarkup(markup: DrawingMarkup): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from(MARKUP_TABLE).delete().eq("id", markup.id);
     if (!error) return;
-    if (!missingTable(error.message)) throw new Error(`Couldn't delete markup #${markup.number}: ${error.message}`);
+    if (!missingTable(error.message)) throw new Error(`Couldn't delete markup #${markup.number}: ${explainRefusal(error.message)}`);
     cloudMissing.add(MARKUP_TABLE);
   }
   await run(MARKUPS, "readwrite", (store) => store.delete(markup.id));
@@ -461,7 +462,7 @@ export async function listPackages(projectId: string): Promise<CommissioningPack
   if (supabase) {
     const { data, error } = await supabase.from(PACKAGE_TABLE).select("data").eq("project_id", projectId);
     if (!error) return (data ?? []).map((row) => sanitizePackage(row.data)).filter((p): p is CommissioningPackage => p !== null);
-    if (!missingTable(error.message)) throw new Error(`Couldn't load the commissioning packages: ${error.message}`);
+    if (!missingTable(error.message)) throw new Error(`Couldn't load the commissioning packages: ${explainRefusal(error.message)}`);
     cloudMissing.add(PACKAGE_TABLE);
   }
   const rows = await run<unknown[]>(PACKAGES, "readonly", (store) => store.index("projectId").getAll(projectId));
@@ -475,7 +476,7 @@ export async function savePackage(pkg: CommissioningPackage): Promise<void> {
       .from(PACKAGE_TABLE)
       .upsert({ id: pkg.id, project_id: pkg.projectId, data: pkg, client_id: CLIENT_ID });
     if (!error) return;
-    if (!missingTable(error.message)) throw new Error(`Couldn't save ${pkg.name || "the package"}: ${error.message}`);
+    if (!missingTable(error.message)) throw new Error(`Couldn't save ${pkg.name || "the package"}: ${explainRefusal(error.message)}`);
     cloudMissing.add(PACKAGE_TABLE);
   }
   await run(PACKAGES, "readwrite", (store) => store.put(pkg));
@@ -486,7 +487,7 @@ export async function deletePackage(pkg: CommissioningPackage): Promise<void> {
   if (supabase) {
     const { error } = await supabase.from(PACKAGE_TABLE).delete().eq("id", pkg.id);
     if (!error) return;
-    if (!missingTable(error.message)) throw new Error(`Couldn't delete ${pkg.name || "the package"}: ${error.message}`);
+    if (!missingTable(error.message)) throw new Error(`Couldn't delete ${pkg.name || "the package"}: ${explainRefusal(error.message)}`);
     cloudMissing.add(PACKAGE_TABLE);
   }
   await run(PACKAGES, "readwrite", (store) => store.delete(pkg.id));
